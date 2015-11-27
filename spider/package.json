@@ -1,0 +1,16 @@
+{
+  "name": "smart-buy-spider",
+  "version": "0.0.1",
+  "description": "spider",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "William Yang",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^1.5.0",
+    "bluebird": "^3.0.5",
+    "superagent": "^1.4.0"
+  }
+}
