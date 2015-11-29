@@ -1,5 +1,7 @@
 {
     "homeSearchUrl" : "https://s.taobao.com/search",
     "rgExpToMatch" : "g_page_config.*;",
-    "rgExpToReplace" : "g_page_config = "
+    "rgExpToReplace" : "(g_page_config = )|;",
+    "pagesToSearch" : 10,
+    "pageDataValue" : 44
 }
