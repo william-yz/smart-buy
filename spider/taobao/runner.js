@@ -16,8 +16,7 @@ var homeSearchUrl = config.homeSearchUrl,
     pagesToSearch = config.pagesToSearch,
     pageDataValue = config.pageDataValue;
 
-var searchItem = '篮球';
-for (var i = 0; i < pagesToSearch; i ++) {
+function worder(searchItem, i) {
     var dataValue = pageDataValue * i;
     superagent.get(homeSearchUrl+'?q='+searchItem + '&data-key=s&data-value=' + dataValue )
         .end(function(err, res) {
@@ -33,20 +32,34 @@ for (var i = 0; i < pagesToSearch; i ++) {
                 }
                 text = text.substring(0,text.length-1);
                 text = text.replace(rgExpToReplace,'');
-                var parsedText = JSON.parse(text),
-                    itemInfoList = parsedText.mods.itemlist.data.auctions,
-                    today = moment().format('YYYYMMDD'); 
-                itemInfoList.forEach(function(itemInfo) {
-                    itemInfo.searchItem = searchItem;
-                });
-                db.insert('originData' + today, itemInfoList);
+                try {
+                    var parsedText = JSON.parse(text),
+                        itemInfoList = parsedText.mods.itemlist.data.auctions,
+                        today = moment().format('YYYYMMDD');
+                    itemInfoList.forEach(function(itemInfo) {
+                        itemInfo.searchItem = searchItem;
+                    });
+                    db.insert('originData' + today, itemInfoList);
+                } catch(e) {
+                    console.log(parsedText);
+                }
+
                 // fs.writeFile('./test', text, function(){
                 //     console.log('done!');
                 // });
-                // 
+                //
                 // console.info(t.mods.itemlist.data.auctions);
             }
-            
         });
 }
-
+var runner = function(searchItem) {
+    var times = 0;
+    var timer = setInterval(function() {
+        worder(searchItem, times);
+        if(times == pagesToSearch -1) {
+            clearInterval(timer);
+        }
+        times ++;
+    }, 1000);
+};
+module.exports = runner;

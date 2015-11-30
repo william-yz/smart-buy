@@ -52,7 +52,7 @@ var insert = function(conllectionName, data) {
             console.log(err);
         })
         .finally(function() {
-            db.close();
+            //db.close();
         });
 }
 
