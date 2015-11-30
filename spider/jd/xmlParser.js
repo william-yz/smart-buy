@@ -6,37 +6,51 @@ var EventEmitter = require('events').EventEmitter,
     util = require('util');
 var xml = require('node-xml');
 
+function getAttr(attrs) {
+    if (!attrs || attrs.length == 0) {
+        return function () {
+            return null;
+        }
+    }
+    return function(attrName) {
+        for (var i = 0,ln = attrs.length; i < ln; i ++) {
+            if (attrs[i][0] === attrName) {
+                return attrs[i][1];
+            }
+        }
+        return null;
+    }
+}
 module.exports = function(xmlDoc, afterParser) {
-    var start =false,
-        commentStart = false;
+    var commentStart = false;
     var goodsInfoList = [];
     var goodsInfo;
-    console.log(xmlDoc);
     var parser = new xml.SaxParser(function(cb) {
         cb.onStartElementNS(function(elem, attrs) {
-            console.log(elem);
-            if (!start && attrs && attrs.id === 'J_goodsList') {
-                start = true;
+            var attrFinder = getAttr(attrs);
+            var goodsId = attrFinder('data-sku'),
+                name = attrFinder('title'),
+                img = attrFinder('src'),
+                price = attrFinder('data-price'),
+                id = attrFinder('id');
+                console.log(elem);
+            if (elem === 'li' &&  goodsId) {
+                goodsInfo = {};
+                goodsInfo.goodsId = goodsId;
             }
-            if (start) {
-                if (elem === 'li' &&  attrs.data-sku) {
-                    goodsInfo = {};
-                    goodsInfo.goodsId = attrs.data-sku;
-                }
-                if (!goodsInfo.name && elem==='a') {
-                    goodsInfo.name = attrs.title;
-                }
-                if (!goodsInfo.img && elem === 'img') {
-                    goodsInfo.img = attrs.src;
-                }
-                if (!goodsInfo.price && attrs.data-price) {
-                    goodsInfo.price = attrs.data-price;
-                }
-                if (!goodsInfo.commentCount && attrs.id === 'J_comment_' + goodsInfo.goodsId) {
-                    commentStart = true;
-                }
-                goodsInfoList.push(goodsInfo);
+            if (!goodsInfo.name && elem === 'a' && name) {
+                goodsInfo.name = name;
             }
+            if (!goodsInfo.img && elem === 'img' && img) {
+                goodsInfo.img = img;
+            }
+            if (!goodsInfo.price && price) {
+                goodsInfo.price = price;
+            }
+            if (!goodsInfo.commentCount && id === 'J_comment_' + goodsInfo.goodsId) {
+                commentStart = true;
+            }
+            goodsInfoList.push(goodsInfo);
         });
         cb.onCharacters(function(chars) {
             if (commentStart) {

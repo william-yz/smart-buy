@@ -5,7 +5,7 @@
 
 var superagent = require('superagent'),
     cheerio = require('cheerio');
-
+var fs = require('fs');
 var xmlParser = require('./xmlParser');
 superagent.get('http://search.jd.com/Search')
     .query({keyword : '篮球'})
@@ -14,7 +14,10 @@ superagent.get('http://search.jd.com/Search')
         if (err) {
             console.log(err);
         } else {
-            xmlParser(res.text.replace(/.*DOCTYPE html>/,''), function(result) {
+            var $ = cheerio.load(res.text);
+            // var html = $.html().replace(/.*DOCTYPE html>/,''),
+            fs.writeFile('./ttt', $('#J_goodsList ul').html());
+            xmlParser($('#J_goodsList ul').html(), function(result) {
                 console.log(result);
             });
         }
