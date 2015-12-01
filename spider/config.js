@@ -2,8 +2,7 @@
 
 exports = module.exports = {
     db : {
-        host : 'localhost',
-        port : 27017,
+        url : 'mongodb://localhost:27017/smartBuy',
         config : {
             auto_reconnect : true
         }
