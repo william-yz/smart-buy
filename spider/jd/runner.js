@@ -10,6 +10,37 @@ var superagent = require('superagent'),
 var fs = require('fs'),
     db = require('../db/dbFacade');
 
+class Runner {
+    constructor(oriQuery) {
+        this.oriQuery = oriQuery;
+    }
+
+    [Symbol.searh](queryItem, page, cb) {
+        var queryPage = page * 2 + 1,
+            keyword = queryItem.keyword,
+            ev = '';
+        if (queryItem.brand) {
+            ev += 'exbrand_' + queryItem.brand + '@';
+        }
+        if (queryItem.price) {
+            ev += 'exprice_' + queryItem.price + '@';
+        }
+
+        superagent.get('http://search.jd.com/Search')
+            .query({keyword : keyword})
+            .query({page : queryPage})
+            .query({enc : 'utf-8'})
+            .query({ev : ev})
+            .end(function(err, res) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        cb(res);
+                    }
+                });
+    }
+}
+
 var search = function(queryItem, page, cb) {
     var queryPage = page * 2 + 1,
         keyword = queryItem.keyword,
@@ -54,7 +85,6 @@ function queryAllWithBrand(queryItems) {
 }
 
 function queryAllWithoutBrand(queryItems) {
-    _queryAll(queryItems, getBrand, );
 }
 
 function _queryAll(queryItems, handler, next) {
